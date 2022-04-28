@@ -6,7 +6,6 @@ from cv2 import VideoCapture, cvtColor, COLOR_BGR2HSV, split, adaptiveThreshold,
     FONT_HERSHEY_COMPLEX, putText, medianBlur, COLOR_BGR2GRAY, GaussianBlur, ADAPTIVE_THRESH_MEAN_C, \
     CHAIN_APPROX_NONE, moments, HoughCircles, HOUGH_GRADIENT, circle, COLOR_GRAY2BGR
 from numpy import pi, ndarray, around, concatenate, uint16
-# import cv2
 
 TRIANGLE = 3
 QUADRANGLE = 4
@@ -49,11 +48,11 @@ def check_true_coordinates(contour_coordinates, hough_coordinates, delta=20) -> 
 
 def unification(ok_coordinates, not_ok_coordinates, delta=20) -> Optional[Tuple]:
     save_p = []
-    for never in not_ok_coordinates:
-        dx = abs(ok_coordinates[0] - never[0])
-        dy = abs(ok_coordinates[1] - never[1])
+    for not_ok_coordinate in not_ok_coordinates:
+        dx = abs(ok_coordinates[0] - not_ok_coordinate[0])
+        dy = abs(ok_coordinates[1] - not_ok_coordinate[1])
         if delta > dx and delta > dy:
-            save_p.append(never)
+            save_p.append(not_ok_coordinate)
 
     x = sum(i[0] for i in save_p)
     y = sum(i[1] for i in save_p)
@@ -91,9 +90,9 @@ def line_intersection(line1, line2):
 
 
 def change_threshold_for_hough(s_lines, threshold):
-    if len(s_lines) > 10 and threshold < 200:
+    if len(s_lines) > 12 and threshold < 200:
         threshold = threshold + 10
-    elif len(s_lines) < 5 and threshold > 50:
+    elif len(s_lines) < 8 and threshold > 50:
         threshold = threshold - 10
     return threshold
 
@@ -207,7 +206,6 @@ def main():
         img = cvtColor(hough_copy, COLOR_BGR2HSV)
         h, s, v = split(img)
         th2 = adaptiveThreshold(s, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY, 1023, -105)
-        # thresh_for_line = GaussianBlur(th2, (7, 7), 0)
         thresh_for_line = medianBlur(th2, 9)
         canny2 = Canny(thresh_for_line, 220, 250)
         #########################################################################################
